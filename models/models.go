@@ -2,7 +2,7 @@ package models
 
 type Transfer struct {
 	ContractAddress string `json:"contractAddress"`
-	TokenId         string `json:"tokenId"` //should it be string?
+	TokenId         string `json:"tokenId"`
 	From            string `json:"from"`
 	To              string `json:"to"`
 	Amount          string `json:"amount"`
@@ -13,7 +13,7 @@ type Transfer struct {
 
 type Nft struct {
 	ContractAddress string `json:"contractAddress"`
-	TokenId         string `json:"tokenId"` //should it be string?
+	TokenId         string `json:"tokenId"`
 	OwnerAddress	string `json:"ownerAddress"`
 	Name			string `json:"name"`
 	Symbol			string `json:"symbol"`
