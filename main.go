@@ -12,6 +12,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	// "github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	"github.com/mgurevin/ethlogscanner"
 	"github.com/pkg/errors"
@@ -20,6 +21,8 @@ import (
 
 	"github.com/universexyz/nftscraper/contract/erc1155"
 	"github.com/universexyz/nftscraper/contract/erc721"
+
+	"github.com/universexyz/nftscraper/models" // how to make it local?
 )
 
 func init() {
@@ -52,6 +55,10 @@ func main() {
 
 	// parse the given app flags
 	flag.Parse()
+
+	//db connection
+	//refactor this approach with @Zero
+	models.Init()	
 
 	// execute app
 	if err := run(ctx); err != nil {
@@ -121,6 +128,10 @@ func run(ctx context.Context) error {
 				switch l.Topics[0] {
 				case erc721ABI.Events["Transfer"].ID:
 					log.Info().Msgf("Transfer: %s", l.Cursor().String())
+					
+					
+
+					return errors.WithStack(nil)
 
 				case erc1155ABI.Events["TransferSingle"].ID:
 					log.Info().Msgf("TransferSingle: %s", l.Cursor().String())
