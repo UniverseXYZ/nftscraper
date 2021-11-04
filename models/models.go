@@ -1,6 +1,7 @@
 package models
 
 type Transfer struct {
+	Id				uint64 `json:"id"`
 	ContractAddress string `json:"contractAddress"`
 	TokenId         string `json:"tokenId"`
 	From            string `json:"from"`
@@ -12,6 +13,7 @@ type Transfer struct {
 }
 
 type Nft struct {
+	// Id				uint64 `json:"id"`
 	ContractAddress string `json:"contractAddress"`
 	TokenId         string `json:"tokenId"`
 	OwnerAddress	string `json:"ownerAddress"`
@@ -23,7 +25,9 @@ type Nft struct {
 }
 
 type NftCollection struct {
+	Id				uint64 `json:"id"`
+	ContractAddress string `json:"contractAddress"`
 	Name 			string `json:"name"`
 	Symbol 			string `json:"symbol"`
-	Amount			string `json:"amount"` 			
+	NumberOfNfts	string `json:"numberOfNfts"`			
 }
