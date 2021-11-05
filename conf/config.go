@@ -17,11 +17,12 @@ type logLevel zerolog.Level
 
 type Config struct {
 	PostgresDSN      string        `env:"POSTGRESQL_DSN"`
-	DBHost      	 string        `env:"DB_HOST"`
-	DBPort      	 uint32        `env:"DB_PORT"`
-	DBUser      	 string        `env:"DB_USER"`
+	DBHost           string        `env:"DB_HOST"`
+	DBPort           uint32        `env:"DB_PORT"`
+	DBUser           string        `env:"DB_USER"`
 	DBPassword       string        `env:"DB_PASSWORD"`
-	DBName      	 string        `env:"DB_NAME"`
+	DBName           string        `env:"DB_NAME"`
+	DBSSL            string        `env:"DB_SSL"`
 	Web3URL          string        `env:"WEB3_URL"`
 	ChainScanPeriod  time.Duration `env:"CHAIN_SCAN_PERIOD"   envDefault:"30s"`
 	StayBehindToHead uint          `env:"STAY_BEHIND_TO_HEAD" envDefault:"8"`

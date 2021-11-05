@@ -11,22 +11,30 @@ import (
 )
 
 //Executes DB migration
-func Run() {
-
+func Run(migrationType string) {
 	m, err := migrate.New(
-		"file://migrate/migrations",
-		// conf.Conf().PostgresDSN)
-		fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		conf.Conf().DBHost, 
-		conf.Conf().DBPort, 
-		conf.Conf().DBUser, 
-		conf.Conf().DBPassword, 
-		conf.Conf().DBName))
+		"file://migrate/migrations/",
+		fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s",
+			conf.Conf().DBUser,
+			conf.Conf().DBPassword,
+			conf.Conf().DBHost,
+			conf.Conf().DBPort,
+			conf.Conf().DBName,
+			conf.Conf().DBSSL))
 	if err != nil {
-		log.Fatal("Error trying to start migration: " + err.Error())
+		log.Fatal("Error trying to prepare migration: " + err.Error())
 	}
 
-	if err := m.Up(); err != nil {
-		log.Fatal("Error while running migration: " + err.Error())
+	switch migrationType {
+	case "up":
+		if err := m.Up(); err != nil {
+			log.Fatal("Error while running migration up: " + err.Error())
+		}
+	case "down":
+		if err := m.Down(); err != nil {
+			log.Fatal("Error while running migration down: " + err.Error())
+		}
+	default:
+		log.Fatal("Usage: go run main migrate up/down")
 	}
 }
