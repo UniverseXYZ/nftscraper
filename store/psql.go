@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/google/uuid"
+
 	"github.com/universexyz/nftscraper/conf"
 	"github.com/universexyz/nftscraper/constants"
 	"github.com/universexyz/nftscraper/models"
