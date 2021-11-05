@@ -17,7 +17,6 @@ import (
 	"github.com/universexyz/nftscraper/constants"
 	"github.com/universexyz/nftscraper/migrate"
 	"github.com/universexyz/nftscraper/scraper"
-	"github.com/universexyz/nftscraper/migrate"
 )
 
 var migrationType string
@@ -58,9 +57,9 @@ func main() {
 	flag.Parse()
 
 	// If there's "migrate" argument then we only run DB migration
-	if(len(os.Args) > 1 && "migrate" == os.Args[1]) {
-		migrate.Run()
-		os.Exit(0);
+	if len(os.Args) > 2 && os.Args[1] == "migrate" {
+		migrate.Run(ctx, os.Args[2])
+		os.Exit(0)
 	}
 
 	// execute app
@@ -84,11 +83,11 @@ func run(ctx context.Context) error {
 	// If there's "migrate" argument then we only run DB migration
 	if len(migrationType) > 0 {
 		err := migrate.Run(ctx, migrationType)
-		if(err != nil) {
+		if err != nil {
 			return errors.WithStack(err)
 		}
 		os.Exit(0)
-	}	
+	}
 
 	s, err := scraper.NewService(ctx, &x{})
 	if err != nil {
