@@ -2,7 +2,6 @@ package scraper
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -40,26 +39,4 @@ func (s *Service) handleERC721Transfer(ctx context.Context, rawLog *ethlogscanne
 	log.Info().Str("from", l.From.String()).Str("to", l.To.String()).Str("token_id", l.TokenId.String()).Msg("erc721 transfer")
 
 	return nil
-}
-
-func NewClient(projectId, projectSecret string) *http.Client {
-	return &http.Client{
-		Transport: authTransport{
-			RoundTripper:  http.DefaultTransport,
-			ProjectId:     projectId,
-			ProjectSecret: projectSecret,
-		},
-	}
-}
-
-// authTransport decorates each request with a basic auth header.
-type authTransport struct {
-	http.RoundTripper
-	ProjectId     string
-	ProjectSecret string
-}
-
-func (t authTransport) RoundTrip(r *http.Request) (*http.Response, error) {
-	r.SetBasicAuth(t.ProjectId, t.ProjectSecret)
-	return t.RoundTripper.RoundTrip(r)
 }
