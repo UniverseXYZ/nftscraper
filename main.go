@@ -14,6 +14,7 @@ import (
 	"github.com/rs/zerolog/pkgerrors"
 
 	"github.com/universexyz/nftscraper/conf"
+	"github.com/universexyz/nftscraper/constants"
 	"github.com/universexyz/nftscraper/migrate"
 	"github.com/universexyz/nftscraper/scraper"
 )
@@ -52,7 +53,7 @@ func main() {
 	flag.Parse()
 
 	// If there's "migrate" argument then we only run DB migration
-	if len(os.Args) > 2 && "migrate" == os.Args[1] {
+	if len(os.Args) > 2 && constants.MIGRATE == os.Args[1] {
 		migrate.Run(os.Args[2])
 		os.Exit(0)
 	}
