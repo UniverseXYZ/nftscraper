@@ -1,4 +1,6 @@
 
+BEGIN;
+
 CREATE TABLE IF NOT EXISTS `transfer` (
     id bigserial PRIMARY KEY,
     contractAddress varchar(42) NOT NULL,
@@ -32,3 +34,5 @@ CREATE TABLE IF NOT EXISTS `nftCollection` (
     numberOfNfts varchar(20) NOT NULL,
     UNIQUE(contractAddress)
 );
+
+COMMIT;
