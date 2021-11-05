@@ -1,7 +1,6 @@
 package migrate
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -14,13 +13,7 @@ import (
 func Run(migrationType string) {
 	m, err := migrate.New(
 		"file://migrate/migrations/",
-		fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s",
-			conf.Conf().DBUser,
-			conf.Conf().DBPassword,
-			conf.Conf().DBHost,
-			conf.Conf().DBPort,
-			conf.Conf().DBName,
-			conf.Conf().DBSSL))
+		conf.Conf().PostgresDSN)
 	if err != nil {
 		log.Fatal("Error trying to prepare migration: " + err.Error())
 	}
