@@ -8,6 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/mgurevin/ethlogscanner"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 	"github.com/universexyz/nftscraper/contract/erc721"
 )
 
