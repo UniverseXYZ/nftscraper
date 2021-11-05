@@ -12,7 +12,7 @@ import (
 )
 
 func (s *Service) handleERC721Transfer(ctx context.Context, rawLog *ethlogscanner.Log) error {
-	//	log := zerolog.Ctx(ctx)
+	log := zerolog.Ctx(ctx)
 
 	l := erc721.ERC721Transfer{}
 
@@ -42,7 +42,7 @@ func (s *Service) handleERC721Transfer(ctx context.Context, rawLog *ethlogscanne
 		return errors.WithStack(err)
 	}
 
-	//log.Info().Str("from", l.From.String()).Str("to", l.To.String()).Str("token_id", l.TokenId.String()).Msg("erc721 transfer")
+	log.Info().Str("from", l.From.String()).Str("to", l.To.String()).Str("token_id", l.TokenId.String()).Msg("erc721 transfer")
 
 	return nil
 }
