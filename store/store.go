@@ -1,14 +1,13 @@
 package store
 
+import (
+	"context"
+
+	"github.com/google/uuid"
+	"github.com/universexyz/nftscraper/models"
+)
+
 type Store interface {
-	Write 
-	Read
-}
-
-type Write interface {
-	AddTransfer() error
-}
-
-type Read interface {
-
+	AddNFT(context.Context, *models.NFT) (uuid.UUID, error)
+	AddTransfer(context.Context, *models.NFT) (uuid.UUID, error)
 }

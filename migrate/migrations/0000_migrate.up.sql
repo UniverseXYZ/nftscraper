@@ -2,7 +2,7 @@
 BEGIN;
 
 CREATE TABLE IF NOT EXISTS transfer (
-    id bigserial PRIMARY KEY,
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     contractAddress varchar(42) NOT NULL,
     tokenId varchar(100) NOT NULL,
     "from" varchar(42) NOT NULL,
@@ -14,25 +14,24 @@ CREATE TABLE IF NOT EXISTS transfer (
 );
 
 CREATE TABLE IF NOT EXISTS nft (
-    -- id bigserial PRIMARY KEY,
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     contractAddress varchar(42) NOT NULL,
     tokenId varchar(100) NOT NULL,
     ownerAddress varchar(42) NOT NULL,
     "name" varchar(255) NOT NULL,
     symbol varchar(255) NOT NULL,
+    tokenURI text NOT NULL,
     optimizedUrl text NOT NULL,
     thumbnailUrl text NOT NULL,
-    attributes json,
-    PRIMARY KEY(contractAddress, tokenId)
+    attributes json
 );
 
 CREATE TABLE IF NOT EXISTS nftCollection (
-    id bigserial PRIMARY KEY,
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     contractAddress varchar(42) NOT NULL,
     "name" varchar(255) NOT NULL,
     symbol varchar(255) NOT NULL,
-    numberOfNfts varchar(20) NOT NULL,
-    UNIQUE(contractAddress)
+    numberOfNfts varchar(20) NOT NULL
 );
 
 COMMIT;

@@ -1,7 +1,8 @@
 package migrate
 
 import (
-	"log"
+	"context"
+	"errors"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -10,24 +11,26 @@ import (
 )
 
 //Executes DB migration
-func Run(migrationType string) {
+func Run(ctx context.Context, migrationType string) error {
 	m, err := migrate.New(
 		"file://migrate/migrations/",
 		conf.Conf().PostgresDSN)
 	if err != nil {
-		log.Fatal("Error trying to prepare migration: " + err.Error())
+		return err
 	}
 
 	switch migrationType {
 	case "up":
 		if err := m.Up(); err != nil {
-			log.Fatal("Error while running migration up: " + err.Error())
+			return err
 		}
 	case "down":
 		if err := m.Down(); err != nil {
-			log.Fatal("Error while running migration down: " + err.Error())
+			return err
 		}
 	default:
-		log.Fatal("Usage: go run main migrate up/down")
+		return errors.New("Usage: go run main.go -migrate up or go run main.go -migrate down")
 	}
+
+	return nil
 }

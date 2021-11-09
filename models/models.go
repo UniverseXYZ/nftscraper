@@ -1,9 +1,11 @@
 package models
 
+import "github.com/google/uuid"
+
 type Transfer struct {
-	Id				uint64 `json:"id"`
+	ID				uuid.UUID `json:"id"`
 	ContractAddress string `json:"contractAddress"`
-	TokenId         string `json:"tokenId"`
+	TokenID         string `json:"tokenId"`
 	From            string `json:"from"`
 	To              string `json:"to"`
 	Amount          string `json:"amount"`
@@ -12,22 +14,23 @@ type Transfer struct {
 	LogIndex        uint64 `json:"logIndex"`
 }
 
-type Nft struct {
-	// Id				uint64 `json:"id"`
+type NFT struct {
+	ID				uuid.UUID `json:"id"`
 	ContractAddress string `json:"contractAddress"`
-	TokenId         string `json:"tokenId"`
+	TokenID         string `json:"tokenId"`
 	OwnerAddress	string `json:"ownerAddress"`
 	Name			string `json:"name"`
 	Symbol			string `json:"symbol"`
-	OptimizedUrl	string `json:"optimizedUrl"`
-	ThumbnailUrl	string `json:"thumbnailUrl"`
+	TokenURI		string `json:"tokenUri"`
+	OptimizedURL	string `json:"optimizedUrl"`
+	ThumbnailURL	string `json:"thumbnailUrl"`
 	Attributes		string `json:"attributes"`
 }
 
-type NftCollection struct {
-	Id				uint64 `json:"id"`
+type NFTCollection struct {
+	ID				uuid.UUID `json:"id"`
 	ContractAddress string `json:"contractAddress"`
 	Name 			string `json:"name"`
 	Symbol 			string `json:"symbol"`
-	NumberOfNfts	string `json:"numberOfNfts"`			
+	NumberOfNFTs	string `json:"numberOfNfts"`			
 }

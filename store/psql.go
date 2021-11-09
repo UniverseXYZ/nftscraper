@@ -1,8 +1,10 @@
 package store
 
 import (
+	"context"
 	"log"
 
+	"github.com/google/uuid"
 	"github.com/universexyz/nftscraper/conf"
 	"github.com/universexyz/nftscraper/constants"
 	"github.com/universexyz/nftscraper/models"
@@ -26,42 +28,70 @@ func NewClient() *client {
 }
 
 // Adds an entry to the transfer table
-func (c *client) AddTransfer(transfer models.Transfer) {
-	
+func (c *client) AddTransfer(ctx context.Context, transfer models.Transfer) (uuid.UUID, error) {
+	var newRowID uuid.UUID = uuid.Nil
+	err := c.DB.QueryRowContext(ctx, `
+			INSERT INTO transfer (
+				contractAddress,
+				tokenId,
+				"from",
+				"to",
+				amount,
+				"type",
+				txHash,
+				logIndex
+			)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+			RETURNING id
+		`,
+		transfer.ContractAddress,
+		transfer.TokenID,
+		transfer.From,
+		transfer.To,
+		transfer.Amount,
+		transfer.Type,
+		transfer.TxHash,
+		transfer.LogIndex).Scan(&newRowID)
+
+	if(err != nil) {
+		return uuid.Nil, err
+	}
+
+	return newRowID, nil
 }
 
-// @Zero - can't understand why this is visible when there's no AddNft declared in the interface
 // Adds an entry to the nft table
-func (c *client) AddNft(nft models.Nft) (string, string) {
-	contractAddress := ""
-	tokenId := ""
-	err := c.DB.QueryRow(`
+func (c *client) AddNFT(ctx context.Context, NFT models.NFT) (uuid.UUID, error) {
+	var newRowID uuid.UUID = uuid.Nil
+	err := c.DB.QueryRowContext(ctx, `
 			INSERT INTO nft (
 				contractAddress, 
 				tokenId, 
 				ownerAddress, 
 				name, 
 				symbol, 
+				tokenUri,
 				optimizedUrl, 
 				thumbnailUrl, 
 				attributes
 			)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-			RETURNING contractAddress, tokenId
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+			RETURNING id
 		`,
-		nft.ContractAddress,
-		nft.TokenId,
-		nft.OwnerAddress,
-		nft.Name,
-		nft.Symbol,
-		nft.OptimizedUrl,
-		nft.ThumbnailUrl,
-		nft.Attributes).Scan(&contractAddress, &tokenId)
+		NFT.ContractAddress,
+		NFT.TokenID,
+		NFT.OwnerAddress,
+		NFT.Name,
+		NFT.Symbol,
+		NFT.TokenURI,
+		NFT.OptimizedURL,
+		NFT.ThumbnailURL,
+		NFT.Attributes).Scan(&newRowID)
 	
 	if err != nil {
-		panic(err)
+		return uuid.Nil, err
 	}
 	
-	return contractAddress, tokenId
+	return newRowID, nil
 }
 
