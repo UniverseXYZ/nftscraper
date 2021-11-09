@@ -19,9 +19,13 @@ import (
 	"github.com/universexyz/nftscraper/scraper"
 )
 
+var migrationType string
+
 func init() {
 	// print error stack to the log messages
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
+
+	flag.StringVar(&migrationType, constants.MIGRATE, "", "-migrate up or -migrate down")
 }
 
 func main() {
@@ -52,12 +56,6 @@ func main() {
 	// parse the given app flags
 	flag.Parse()
 
-	// If there's "migrate" argument then we only run DB migration
-	if len(os.Args) > 2 && constants.MIGRATE == os.Args[1] {
-		migrate.Run(os.Args[2])
-		os.Exit(0)
-	}
-
 	// execute app
 	if err := run(ctx); err != nil {
 		logger.Fatal().Stack().Err(err).Msgf("program exited with an error: %+v", err)
@@ -75,6 +73,16 @@ func (xx *x) StoreChainScannerCursor(ctx context.Context, cursor ethlogscanner.C
 
 // run is the entry point for the app, it should live in this function
 func run(ctx context.Context) error {
+
+	// If there's "migrate" argument then we only run DB migration
+	if len(migrationType) > 0 {
+		err := migrate.Run(ctx, migrationType)
+		if(err != nil) {
+			return errors.WithStack(err)
+		}
+		os.Exit(0)
+	}	
+
 	s, err := scraper.NewService(ctx, &x{})
 	if err != nil {
 		return errors.WithStack(err)

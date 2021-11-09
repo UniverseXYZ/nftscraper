@@ -7,6 +7,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.1.1
 	github.com/ethereum/go-ethereum v1.10.11
 	github.com/golang-migrate/migrate/v4 v4.15.1
+	github.com/google/uuid v1.3.0
 	github.com/jmoiron/sqlx v1.3.1
 	github.com/joho/godotenv v1.4.0
 	github.com/mgurevin/ethlogscanner v0.0.1
@@ -21,7 +22,6 @@ require (
 	github.com/deckarep/golang-set v1.7.1 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
-	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.0 // indirect
