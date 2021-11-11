@@ -21,6 +21,9 @@ type Config struct {
 	ChainScanPeriod  time.Duration `env:"CHAIN_SCAN_PERIOD"   envDefault:"30s"`
 	StayBehindToHead uint          `env:"STAY_BEHIND_TO_HEAD" envDefault:"8"`
 	LogLevel         logLevel      `env:"LOG_LEVEL"           envDefault:"DEBUG"`
+	IPFSHost         string        `env:"IPFS_HOST"`
+	IPFSUser         string        `env:"IPFS_USER"`
+	IPFSPass         string        `env:"IPFS_PASS"`
 }
 
 var once sync.Once
