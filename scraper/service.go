@@ -16,11 +16,11 @@ import (
 	"github.com/universexyz/nftscraper/conf"
 	"github.com/universexyz/nftscraper/contract/erc1155"
 	"github.com/universexyz/nftscraper/contract/erc721"
+	"github.com/universexyz/nftscraper/store"
 )
 
 type ServiceDeps interface {
-	LoadChainScannerCursor(ctx context.Context) (ethlogscanner.Cursor, error)
-	StoreChainScannerCursor(ctx context.Context, cursor ethlogscanner.Cursor) error
+	ScraperStore() store.ScraperStore
 }
 
 type Service struct {
@@ -36,6 +36,8 @@ type Service struct {
 	erc721BC         *bind.BoundContract
 	erc1155BC        *bind.BoundContract
 }
+
+const scraperName = "ethereum:mainnet"
 
 func NewService(ctx context.Context, deps ServiceDeps) (*Service, error) {
 	s := &Service{
@@ -125,7 +127,7 @@ func (s *Service) scan(ctx context.Context, shutdownCh <-chan struct{}) error {
 
 	log := zerolog.Ctx(ctx)
 
-	cursor, err := s.deps.LoadChainScannerCursor(ctx)
+	cursor, err := s.deps.ScraperStore().LoadCursor(ctx, scraperName)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -230,7 +232,7 @@ func (s *Service) scan(ctx context.Context, shutdownCh <-chan struct{}) error {
 				case *ethlogscanner.CursorUpdated:
 					log.Trace().Uint64("block_num", n.Next.BlockNum()).Uint("tx_index", n.Next.TxIndex()).Uint("log_index", n.Next.LogIndex()).Msg("cursor updated")
 
-					if err := s.deps.StoreChainScannerCursor(ctx, n.Next); err != nil {
+					if err := s.deps.ScraperStore().StoreCursor(ctx, scraperName, n.Next); err != nil {
 						return errors.WithStack(err)
 					}
 				}

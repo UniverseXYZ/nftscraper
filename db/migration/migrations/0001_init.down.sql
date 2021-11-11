@@ -1,10 +1,11 @@
-
 BEGIN;
 
 DROP TABLE IF EXISTS transfer;
 
 DROP TABLE IF EXISTS nft;
 
-DROP TABLE IF EXISTS nftCollection;
+DROP TABLE IF EXISTS nft_collection;
+
+DROP TABLE IF EXISTS scraper_cursor;
 
 COMMIT;
