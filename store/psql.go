@@ -95,3 +95,28 @@ func (c *client) AddNFT(ctx context.Context, NFT models.NFT) (uuid.UUID, error) 
 	return newRowID, nil
 }
 
+// Adds an entry to the nftCollection table
+func (c *client) AddNFTCollection(ctx context.Context, NFT models.NFTCollection) (uuid.UUID, error) {
+	var newRowID uuid.UUID = uuid.Nil
+	err := c.DB.QueryRowContext(ctx, `
+			INSERT INTO nft (
+				contractAddress, 
+				name, 
+				symbol, 
+				numberOfNfts
+			)
+			VALUES ($1, $2, $3, $4)
+			RETURNING id
+		`,
+		NFT.ContractAddress,
+		NFT.Name,
+		NFT.Symbol,
+		NFT.NumberOfNFTs).Scan(&newRowID)
+	
+	if err != nil {
+		return uuid.Nil, err
+	}
+	
+	return newRowID, nil
+}
+
