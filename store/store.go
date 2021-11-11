@@ -10,4 +10,5 @@ import (
 type Store interface {
 	AddNFT(context.Context, *models.NFT) (uuid.UUID, error)
 	AddTransfer(context.Context, *models.NFT) (uuid.UUID, error)
+	AddNFTCollection(context.Context, *models.NFTCollection) (uuid.UUID, error)
 }
