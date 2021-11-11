@@ -6,6 +6,7 @@ import (
 	"flag"
 	"os"
 	"os/signal"
+	"strings"
 
 	_ "github.com/joho/godotenv"
 	"github.com/mgurevin/ethlogscanner"
@@ -14,18 +15,18 @@ import (
 	"github.com/rs/zerolog/pkgerrors"
 
 	"github.com/universexyz/nftscraper/conf"
-	"github.com/universexyz/nftscraper/constants"
-	"github.com/universexyz/nftscraper/migrate"
+	"github.com/universexyz/nftscraper/db"
+	"github.com/universexyz/nftscraper/db/migration"
 	"github.com/universexyz/nftscraper/scraper"
 )
 
-var migrationType string
+var argMigrate string
 
 func init() {
 	// print error stack to the log messages
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 
-	flag.StringVar(&migrationType, constants.MIGRATE, "", "-migrate up or -migrate down")
+	flag.StringVar(&argMigrate, "migrate", "", "start database migration UP or DOWN")
 }
 
 func main() {
@@ -56,12 +57,6 @@ func main() {
 	// parse the given app flags
 	flag.Parse()
 
-	// If there's "migrate" argument then we only run DB migration
-	if len(os.Args) > 2 && os.Args[1] == "migrate" {
-		migrate.Run(ctx, os.Args[2])
-		os.Exit(0)
-	}
-
 	// execute app
 	if err := run(ctx); err != nil {
 		logger.Fatal().Stack().Err(err).Msgf("program exited with an error: %+v", err)
@@ -79,14 +74,19 @@ func (xx *x) StoreChainScannerCursor(ctx context.Context, cursor ethlogscanner.C
 
 // run is the entry point for the app, it should live in this function
 func run(ctx context.Context) error {
+	dbConn, err := db.Connect(ctx, conf.Conf().PostgresDSN)
+	if err != nil {
+		return errors.WithStack(err)
+	}
 
-	// If there's "migrate" argument then we only run DB migration
-	if len(migrationType) > 0 {
-		err := migrate.Run(ctx, migrationType)
-		if err != nil {
-			return errors.WithStack(err)
-		}
-		os.Exit(0)
+	defer dbConn.Close()
+
+	// add database connection to the application context
+	ctx = db.WithContext(ctx, dbConn)
+
+	// execute migrations if neeeded
+	if err := startMigration(ctx); err != nil {
+		return errors.WithStack(err)
 	}
 
 	s, err := scraper.NewService(ctx, &x{})
@@ -136,6 +136,44 @@ func storeCursor(c ethlogscanner.Cursor) error {
 
 	if err := enc.Encode(c); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// startMigration executes the migration process if requested by the user
+func startMigration(ctx context.Context) error {
+	doMigrate := false
+
+	// check if the flag is provided
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == "migrate" {
+			doMigrate = true
+		}
+	})
+
+	if !doMigrate {
+		return nil
+	}
+
+	migrate, err := migration.NewMigrate(ctx, db.Ctx(ctx))
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	switch strings.ToLower(strings.TrimSpace(argMigrate)) {
+	case "up":
+		if err = migrate.Up(); err != nil {
+			return errors.WithStack(err)
+		}
+
+	case "down":
+		if err = migrate.Down(); err != nil {
+			return errors.WithStack(err)
+		}
+
+	default:
+		return errors.Errorf("unable to parse direction of the migration: `%s` - only `up` or `down` supported", argMigrate)
 	}
 
 	return nil
