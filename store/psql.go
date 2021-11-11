@@ -53,7 +53,7 @@ func (c *client) AddTransfer(ctx context.Context, transfer models.Transfer) (uui
 		transfer.TxHash,
 		transfer.LogIndex).Scan(&newRowID)
 
-	if(err != nil) {
+	if err != nil {
 		return uuid.Nil, err
 	}
 
@@ -87,11 +87,11 @@ func (c *client) AddNFT(ctx context.Context, NFT models.NFT) (uuid.UUID, error) 
 		NFT.OptimizedURL,
 		NFT.ThumbnailURL,
 		NFT.Attributes).Scan(&newRowID)
-	
+
 	if err != nil {
 		return uuid.Nil, err
 	}
-	
+
 	return newRowID, nil
 }
 
@@ -112,11 +112,10 @@ func (c *client) AddNFTCollection(ctx context.Context, NFT models.NFTCollection)
 		NFT.Name,
 		NFT.Symbol,
 		NFT.NumberOfNFTs).Scan(&newRowID)
-	
+
 	if err != nil {
 		return uuid.Nil, err
 	}
-	
+
 	return newRowID, nil
 }
-

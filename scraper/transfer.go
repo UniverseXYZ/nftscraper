@@ -2,7 +2,6 @@ package scraper
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -32,16 +31,10 @@ func (s *Service) handleERC721Transfer(ctx context.Context, rawLog *ethlogscanne
 	}
 
 	if err := s.erc721BC.UnpackLog(&l, s.evTransfer.RawName, types.Log(*rawLog)); err != nil {
-		if err.Error() == "abi: attempting to copy no values while 3 arguments are expected" {
-
-			fmt.Printf("EVENT ID%s\n", s.evTransfer.ID.String())
-			for i, v := range rawLog.Topics {
-				fmt.Printf("TOPIC[%d]: %s\n", i, v.String())
-			}
-			fmt.Println(common.Bytes2Hex(rawLog.Data))
-		}
 		return errors.WithStack(err)
 	}
+
+	l.Raw = types.Log(*rawLog)
 
 	log.Info().Str("from", l.From.String()).Str("to", l.To.String()).Str("token_id", l.TokenId.String()).Msg("erc721 transfer")
 
