@@ -14,12 +14,18 @@ import (
 	"github.com/rs/zerolog/pkgerrors"
 
 	"github.com/universexyz/nftscraper/conf"
+	"github.com/universexyz/nftscraper/constants"
+	"github.com/universexyz/nftscraper/migrate"
 	"github.com/universexyz/nftscraper/scraper"
 )
+
+var migrationType string
 
 func init() {
 	// print error stack to the log messages
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
+
+	flag.StringVar(&migrationType, constants.MIGRATE, "", "-migrate up or -migrate down")
 }
 
 func main() {
@@ -67,6 +73,16 @@ func (xx *x) StoreChainScannerCursor(ctx context.Context, cursor ethlogscanner.C
 
 // run is the entry point for the app, it should live in this function
 func run(ctx context.Context) error {
+
+	// If there's "migrate" argument then we only run DB migration
+	if len(migrationType) > 0 {
+		err := migrate.Run(ctx, migrationType)
+		if(err != nil) {
+			return errors.WithStack(err)
+		}
+		os.Exit(0)
+	}	
+
 	s, err := scraper.NewService(ctx, &x{})
 	if err != nil {
 		return errors.WithStack(err)
