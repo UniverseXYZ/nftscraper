@@ -8,7 +8,7 @@ require (
 	github.com/ethereum/go-ethereum v1.10.11
 	github.com/golang-migrate/migrate/v4 v4.15.1
 	github.com/google/uuid v1.3.0
-	github.com/jmoiron/sqlx v1.3.1
+	github.com/jackc/pgx/v4 v4.13.0
 	github.com/joho/godotenv v1.4.0
 	github.com/mgurevin/ethlogscanner v0.0.1
 	github.com/pkg/errors v0.9.1
@@ -32,7 +32,6 @@ require (
 	github.com/jackc/pgproto3/v2 v2.1.1 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
 	github.com/jackc/pgtype v1.8.1 // indirect
-	github.com/jackc/pgx/v4 v4.13.0 // indirect
 	github.com/lib/pq v1.10.4 // indirect
 	github.com/mitchellh/mapstructure v1.4.2 // indirect
 	github.com/rjeczalik/notify v0.9.2 // indirect
