@@ -46,7 +46,7 @@ func NewTransferStore(ctx context.Context) (TransferStore, error) {
 }
 
 func (t *transferStore) Save(ctx context.Context, transfer *model.Transfer) error {
-	return db.RunNewTx(ctx, func(ctx context.Context, tx *sql.Tx) error {
+	return db.RunTx(ctx, func(ctx context.Context, tx *sql.Tx) error {
 		_, err := tx.StmtContext(ctx, t.stmtSave).ExecContext(ctx, 
 			transfer.ContractAddress,
 			transfer.TokenID,
