@@ -89,7 +89,7 @@ func run(ctx context.Context) error {
 		return errors.WithStack(err)
 	}
 
-	s, err := scraper.NewService(ctx, &x{})
+	s, err := scraper.NewService(ctx, nil)
 	if err != nil {
 		return errors.WithStack(err)
 	}
