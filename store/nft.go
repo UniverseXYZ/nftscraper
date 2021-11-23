@@ -12,12 +12,12 @@ import (
 type NFTStore interface {
 	// FindByTokenID(ctx context.Context, contractAddr, tokenID string) (*model.NFT, error)
 	Save(ctx context.Context, nft *model.NFT) error
-	FindByContractAddressAndTockenID(ctx context.Context, contractAddress string, tokenID string) (*model.NFT, error)
+	FindByContractAddressAndTokenID(ctx context.Context, contractAddress string, tokenID string) (*model.NFT, error)
 }
 
 type nftStore struct {
 	stmtSave *sql.Stmt
-	stmtFindByContractAddressAndTockenID *sql.Stmt
+	stmtFindByContractAddressAndTokenID *sql.Stmt
 }
 
 // Creates and return an instance of nftStore which implements NFTStore interface.
@@ -30,6 +30,7 @@ func NewNFTStore(ctx context.Context) (NFTStore, error) {
 
 	store.stmtSave, err = dbConn.PrepareContext(ctx, `
 		INSERT INTO nft (
+			id,
 			contract_addr,
 			token_id,
 			owner_addr,
@@ -46,7 +47,7 @@ func NewNFTStore(ctx context.Context) (NFTStore, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	store.stmtFindByContractAddressAndTockenID, err = dbConn.PrepareContext(ctx, `
+	store.stmtFindByContractAddressAndTokenID, err = dbConn.PrepareContext(ctx, `
 		SELECT *
 		FROM nft
 		WHERE contract_addr = $1 AND
@@ -61,8 +62,9 @@ func NewNFTStore(ctx context.Context) (NFTStore, error) {
 
 // Adds a new entry to the nft table
 func (n *nftStore) Save(ctx context.Context, nft *model.NFT) error {
-	return db.RunNewTx(ctx, func(ctx context.Context, tx *sql.Tx) error {
+	return db.RunTx(ctx, func(ctx context.Context, tx *sql.Tx) error {
 		_, err := tx.StmtContext(ctx, n.stmtSave).ExecContext(ctx,
+			nft.ID,
 			nft.ContractAddress,
 			nft.TokenID,
 			nft.OwnerAddress,
@@ -81,11 +83,11 @@ func (n *nftStore) Save(ctx context.Context, nft *model.NFT) error {
 }
 
 // Returns an instance of model.NFT by looking up in the nft table by contractAddress and tokenID
-func (n *nftStore) FindByContractAddressAndTockenID(ctx context.Context, contractAddress string, tokenID string) (*model.NFT, error) {
+func (n *nftStore) FindByContractAddressAndTokenID(ctx context.Context, contractAddress string, tokenID string) (*model.NFT, error) {
 	var nft model.NFT
 	
-	err := db.RunNewTx(ctx, func(ctx context.Context, tx *sql.Tx) error {
-		row := tx.StmtContext(ctx, n.stmtFindByContractAddressAndTockenID).QueryRowContext(ctx, contractAddress, tokenID)
+	err := db.RunTx(ctx, func(ctx context.Context, tx *sql.Tx) error {
+		row := tx.StmtContext(ctx, n.stmtFindByContractAddressAndTokenID).QueryRowContext(ctx, contractAddress, tokenID)
 		err := row.Scan(&nft.ID,
 			&nft.ContractAddress,
 			&nft.TokenID,

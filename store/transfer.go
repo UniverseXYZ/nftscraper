@@ -28,6 +28,7 @@ func NewTransferStore(ctx context.Context) (TransferStore, error) {
 
 	store.stmtSave, err = dbConn.PrepareContext(ctx, `
 		INSERT INTO transfer (
+			id,
 			contract_addr,
 			token_id,
 			"from",
@@ -37,7 +38,7 @@ func NewTransferStore(ctx context.Context) (TransferStore, error) {
 			"tx_hash",
 			"log_index"
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 	`)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -48,8 +49,9 @@ func NewTransferStore(ctx context.Context) (TransferStore, error) {
 
 // Adds a new entry to the nft table
 func (t *transferStore) Save(ctx context.Context, transfer *model.Transfer) error {
-	return db.RunNewTx(ctx, func(ctx context.Context, tx *sql.Tx) error {
+	return db.RunTx(ctx, func(ctx context.Context, tx *sql.Tx) error {
 		_, err := tx.StmtContext(ctx, t.stmtSave).ExecContext(ctx, 
+			transfer.ID,
 			transfer.ContractAddress,
 			transfer.TokenID,
 			transfer.From,

@@ -27,6 +27,7 @@ func NewNFTCollectionStore(ctx context.Context) (NFTCollectionStore, error) {
 
 	store.stmtSave, err = dbConn.PrepareContext(ctx, `
 		INSERT INTO nft_collection (
+			id,
 			contract_addr,
 			name,
 			symbol,
@@ -43,8 +44,9 @@ func NewNFTCollectionStore(ctx context.Context) (NFTCollectionStore, error) {
 
 // Adds a new entry to the nft_collection table
 func (n *nftCollectionStore) Save(ctx context.Context, nftCollection *model.NFTCollection) error {
-	return db.RunNewTx(ctx, func(ctx context.Context, tx *sql.Tx) error {
+	return db.RunTx(ctx, func(ctx context.Context, tx *sql.Tx) error {
 		_, err := tx.StmtContext(ctx, n.stmtSave).ExecContext(ctx,
+			nftCollection.ID,
 			nftCollection.ContractAddress,
 			nftCollection.Name,
 			nftCollection.Symbol,
