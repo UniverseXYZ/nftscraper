@@ -33,7 +33,7 @@ func NewNFTCollectionStore(ctx context.Context) (NFTCollectionStore, error) {
 			symbol,
 			num_nfts
 		)
-		VALUES ($1, $2, $3, $4)
+		VALUES ($1, $2, $3, $4, $5)
 	`)
 	if err != nil {
 		return nil, errors.WithStack(err)

@@ -41,7 +41,7 @@ func NewNFTStore(ctx context.Context) (NFTStore, error) {
 			thumbnail_url,
 			attributes
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 	`)
 	if err != nil {
 		return nil, errors.WithStack(err)
