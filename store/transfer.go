@@ -18,6 +18,7 @@ type transferStore struct {
 	stmtSave *sql.Stmt
 }
 
+// Creates and return an instance of transferStore which implements TransferStore interface.
 func NewTransferStore(ctx context.Context) (TransferStore, error) {
 	var err error
 
@@ -27,6 +28,7 @@ func NewTransferStore(ctx context.Context) (TransferStore, error) {
 
 	store.stmtSave, err = dbConn.PrepareContext(ctx, `
 		INSERT INTO transfer (
+			id,
 			contract_addr,
 			token_id,
 			"from",
@@ -36,7 +38,7 @@ func NewTransferStore(ctx context.Context) (TransferStore, error) {
 			"tx_hash",
 			"log_index"
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 	`)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -45,9 +47,11 @@ func NewTransferStore(ctx context.Context) (TransferStore, error) {
 	return store, nil
 }
 
+// Adds a new entry to the nft table
 func (t *transferStore) Save(ctx context.Context, transfer *model.Transfer) error {
 	return db.RunTx(ctx, func(ctx context.Context, tx *sql.Tx) error {
 		_, err := tx.StmtContext(ctx, t.stmtSave).ExecContext(ctx, 
+			transfer.ID,
 			transfer.ContractAddress,
 			transfer.TokenID,
 			transfer.From,
