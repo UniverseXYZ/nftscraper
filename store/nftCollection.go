@@ -11,10 +11,12 @@ import (
 
 type NFTCollectionStore interface {
 	Save(ctx context.Context, nft *model.NFTCollection) error
+	FindByContractAddress(ctx context.Context, contractAddress string) ([]model.NFTCollection, error)
 }
 
 type nftCollectionStore struct {
 	stmtSave *sql.Stmt
+	stmtFindByContractAddress *sql.Stmt
 }
 
 // Creates and return an instance of nftCollectionStore which implements NFTCollectionStore interface.
@@ -39,6 +41,15 @@ func NewNFTCollectionStore(ctx context.Context) (NFTCollectionStore, error) {
 		return nil, errors.WithStack(err)
 	}
 
+	store.stmtFindByContractAddress, err = dbConn.PrepareContext(ctx, `
+		SELECT *
+		FROM nft_collection
+		WHERE contract_addr = $1
+	`)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
 	return store, nil
 }
 
@@ -57,4 +68,43 @@ func (n *nftCollectionStore) Save(ctx context.Context, nftCollection *model.NFTC
 
 		return nil
 	})
+}
+
+// Returns a slice of model.NFTCollection by looking up in the nft_collection table by contractAddress
+// There may be multiple nft collections with same contract address due to artblocks.
+// @See https://www.artblocks.io/
+func (n *nftCollectionStore) FindByContractAddress(ctx context.Context, contractAddress string) ([]model.NFTCollection, error) {
+	var nftCollections = make([]model.NFTCollection, 0)
+
+	err := db.RunTx(ctx, func(ctx context.Context, tx *sql.Tx) error {
+		rows, err := tx.StmtContext(ctx, n.stmtFindByContractAddress).QueryContext(ctx, contractAddress)
+		if err != nil {
+			return errors.WithStack(err)
+		}
+
+		defer rows.Close()
+
+		for rows.Next() {
+			var nftCollection model.NFTCollection
+			err := rows.Scan(
+				&nftCollection.ID,
+				&nftCollection.ContractAddress,
+				&nftCollection.Name,
+				&nftCollection.Symbol,
+				&nftCollection.NumberOfNFTs)
+			if err != nil {
+				// return errors.WithStack(err)
+				break
+			}
+			nftCollections = append(nftCollections, nftCollection)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return nftCollections, nil
 }
