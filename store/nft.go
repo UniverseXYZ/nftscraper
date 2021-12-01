@@ -30,6 +30,7 @@ func NewNFTStore(ctx context.Context) (NFTStore, error) {
 	store.stmtSave, err = dbConn.PrepareContext(ctx, `
 		INSERT INTO nft (
 			id,
+			nft_collection_id,
 			contract_addr,
 			token_id,
 			owner_addr,
@@ -40,7 +41,7 @@ func NewNFTStore(ctx context.Context) (NFTStore, error) {
 			thumbnail_url,
 			attributes
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 	`)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -64,6 +65,7 @@ func (n *nftStore) Save(ctx context.Context, nft *model.NFT) error {
 	return db.RunTx(ctx, func(ctx context.Context, tx *sql.Tx) error {
 		_, err := tx.StmtContext(ctx, n.stmtSave).ExecContext(ctx,
 			nft.ID,
+			nft.NFTCollectionID,
 			nft.ContractAddress,
 			nft.TokenID,
 			nft.OwnerAddress,
@@ -87,7 +89,9 @@ func (n *nftStore) FindByContractAddressAndTokenID(ctx context.Context, contract
 	
 	err := db.RunTx(ctx, func(ctx context.Context, tx *sql.Tx) error {
 		row := tx.StmtContext(ctx, n.stmtFindByContractAddressAndTokenID).QueryRowContext(ctx, contractAddress, tokenID)
-		err := row.Scan(&nft.ID,
+		err := row.Scan(
+			&nft.ID,
+			&nft.NFTCollectionID,
 			&nft.ContractAddress,
 			&nft.TokenID,
 			&nft.OwnerAddress,

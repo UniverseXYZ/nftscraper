@@ -16,6 +16,7 @@ import (
 
 	"github.com/universexyz/nftscraper/conf"
 	"github.com/universexyz/nftscraper/db"
+
 	"github.com/universexyz/nftscraper/db/migration"
 	"github.com/universexyz/nftscraper/scraper"
 )
@@ -26,7 +27,7 @@ func init() {
 	// print error stack to the log messages
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 
-	flag.StringVar(&argMigrate, "migrate", "", "start database migration UP or DOWN")
+	flag.StringVar(&argMigrate, "migrate", "", "start database migration UP or DOWN. EXIT to stop the program.")
 }
 
 func main() {
@@ -141,7 +142,8 @@ func storeCursor(c ethlogscanner.Cursor) error {
 	return nil
 }
 
-// startMigration executes the migration process if requested by the user
+// startMigration executes the migration process if requested by the user.
+// stops the program if the "exit" argument is provided.
 func startMigration(ctx context.Context) error {
 	doMigrate := false
 
@@ -160,7 +162,6 @@ func startMigration(ctx context.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-
 	switch strings.ToLower(strings.TrimSpace(argMigrate)) {
 	case "up":
 		if err = migrate.Up(); err != nil {
@@ -174,6 +175,11 @@ func startMigration(ctx context.Context) error {
 
 	default:
 		return errors.Errorf("unable to parse direction of the migration: `%s` - only `up` or `down` supported", argMigrate)
+	}
+
+	argTail := flag.Args()
+	if len(argTail) > 0 && strings.Compare("exit", strings.TrimSpace(argTail[0])) == 0 {
+		os.Exit(0)
 	}
 
 	return nil

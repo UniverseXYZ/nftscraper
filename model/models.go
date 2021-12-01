@@ -16,6 +16,7 @@ type Transfer struct {
 
 type NFT struct {
 	ID              uuid.UUID `json:"id"`
+	NFTCollectionID uuid.UUID `json:"nft_collection_id"`
 	ContractAddress string    `json:"contract_addr"`
 	TokenID         string    `json:"token_id"`
 	OwnerAddress    string    `json:"owner_addr"`
